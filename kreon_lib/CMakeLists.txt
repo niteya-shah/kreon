@@ -22,7 +22,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -lrt -lm -pthread -lnuma")
 
 add_library(${KREON_LIB} ${KREON_C_SOURCE_FILES})
 set_property(TARGET ${KREON_LIB} PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(${KREON_LIB} log)
+target_link_libraries(${KREON_LIB} log $ENV{UMAP_LIB})
 set_source_files_properties(allocator/spin_loop.c PROPERTIES COMPILE_FLAGS
                                                              "-O0")
 
@@ -33,10 +33,18 @@ add_executable(
   allocator/persistent_operations.c btree/segment_allocator.c
   utilities/spin_loop.c utilities/list.c)
 
+add_definitions(-DUSE_UMAP)
+#add_subdirectory($ENV{UMAP_INCL} build)
+message("incl is $ENV{UMAP_INCL}")
+include_directories($ENV{UMAP_INCL})
+target_link_libraries(mkfs.kreon $ENV{UMAP_LIB})
+
 target_link_libraries(mkfs.kreon log)
 set_target_properties(
   ${KREON_LIB} PROPERTIES PUBLIC_HEADER
                           "${CMAKE_CURRENT_SOURCE_DIR}/include/kreon.h")
+
+
 
 install(
   TARGETS ${KREON_LIB} mkfs.kreon
