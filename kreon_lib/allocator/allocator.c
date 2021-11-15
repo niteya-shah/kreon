@@ -40,9 +40,9 @@
 #include "../btree/segment_allocator.h"
 #include "../utilities/list.h"
 
-#ifdef USE_UMAP
+
 #include <umap.h>
-#endif
+
 
 //#define USE_MLOCK
 #define __NR_mlock2 284
@@ -170,12 +170,15 @@ off64_t mount_volume(char *volume_name, int64_t start, int64_t unused_size)
 		}
 
 		log_info("Creating virtual address space offset %lld size %ld\n", (long long)start, device_size);
-#ifdef USE_UMAP
+		if(map == 0)
+		{
 		// mmap the device
-		char *addr_space = mmap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
-#else
-		char *addr_space = umap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
-#endif
+			char *addr_space = mmap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
+		}
+		else
+		{
+			char *addr_space = umap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
+		}
 		if (addr_space == MAP_FAILED) {
 			log_fatal("MMAP for device %s reason follows", volume_name);
 			perror("Reason for mmap");
