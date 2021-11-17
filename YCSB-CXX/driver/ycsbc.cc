@@ -203,7 +203,6 @@ void execute_run(utils::Properties &props, ycsbc::YCSBDB *db)
 {
 	ycsbc::CoreWorkload wl;
 	wl.Init(props);
-	MAP_STATE = MAP_UMAP;
 	const int num_threads = stoi(props.GetProperty("threadcount", "1"));
 	std::atomic_bool cancellation_token(false);
 	std::vector<uint64_t> ops_data;
