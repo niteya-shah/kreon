@@ -182,7 +182,7 @@ off64_t mount_volume(char *volume_name, int64_t start, int64_t unused_size)
 		else
 		{
 			log_info("Using UMap");
-			addr_space = umap(NULL, device_size, PROT_READ, MAP_SHARED, FD, start);
+			addr_space = umap(NULL, device_size, PROT_READ, MAP_PRIVATE, FD, start);
 		}
 		if (addr_space == MAP_FAILED) {
 			log_fatal("MMAP for device %s reason follows", volume_name);
