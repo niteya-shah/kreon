@@ -84,6 +84,10 @@ unsigned long long find_prefix_miss;
 unsigned long long scan_prefix_hit;
 unsigned long long scan_prefix_miss;
 
+#define MAP_UMAP 1
+#define MAP_MMAP 0
+int MAP_STATE;
+
 extern db_handle *open_dbs;
 pthread_mutex_t VOLUME_LOCK = PTHREAD_MUTEX_INITIALIZER;
 // volatile uint64_t snapshot_v1;
@@ -169,15 +173,16 @@ off64_t mount_volume(char *volume_name, int64_t start, int64_t unused_size)
 			exit(EXIT_FAILURE);
 		}
 
+		char *addr_space;
 		log_info("Creating virtual address space offset %lld size %ld\n", (long long)start, device_size);
-		if(map == 0)
+		if(MAP_STATE == 0)
 		{
 		// mmap the device
-			char *addr_space = mmap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
+			addr_space = mmap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
 		}
 		else
 		{
-			char *addr_space = umap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
+			addr_space = umap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
 		}
 		if (addr_space == MAP_FAILED) {
 			log_fatal("MMAP for device %s reason follows", volume_name);

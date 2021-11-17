@@ -36,6 +36,8 @@
 /*size in 4KB blocks of the log used for marking the free ops*/
 #define FREE_LOG_SIZE_IN_BLOCKS 512000
 
+extern int MAP_STATE;
+
 typedef enum volume_state { VOLUME_IS_OPEN = 0x00, VOLUME_IS_CLOSING = 0x01, VOLUME_IS_CLOSED = 0x02 } volume_state;
 
 /**

@@ -55,9 +55,6 @@ struct klc_key_value {
 	struct klc_value v;
 };
 
-#define MAP_UMAP 1
-#define MAP_MMAP 0
-int map;
 
 // Opens a region based on the options provided.
 klc_handle klc_open(klc_db_options *options);

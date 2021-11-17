@@ -43,7 +43,7 @@ echo 'Device:' "${DEV_NAME}" 'has size' "${DEV_SIZE}" 'bytes'
 echo 'Allocator size:' "${ALLOCATOR_SIZE}"
 
 for i in $(seq 0 $((DB_NUM - 1))); do
-	OFFSET=$( (${i} \* ALLOCATOR_SIZE))
+	OFFSET=$((${i} * ALLOCATOR_SIZE))
 	${MKFS_KREON} "${DEV_NAME}" "${OFFSET}" "${ALLOCATOR_SIZE}" >/dev/null
 done
 exit 0

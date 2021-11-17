@@ -22,11 +22,9 @@ klc_handle klc_open(klc_db_options *options)
 {
 	switch (options->create_flag) {
 	case KLC_CREATE_DB:
-		map = MAP_MMAP;
 		return (klc_handle)db_open(options->volume_name, options->volume_start, options->volume_size,
 					   (char *)options->db_name, CREATE_DB);
 	case KLC_DONOT_CREATE_DB:
-		map = MAP_UMAP;
 		return (klc_handle)db_open(options->volume_name, options->volume_start, options->volume_size,
 					   (char *)options->db_name, DONOT_CREATE_DB);
 	default:
