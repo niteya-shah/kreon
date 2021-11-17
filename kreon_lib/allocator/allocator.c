@@ -84,8 +84,6 @@ unsigned long long find_prefix_miss;
 unsigned long long scan_prefix_hit;
 unsigned long long scan_prefix_miss;
 
-#define MAP_UMAP 1
-#define MAP_MMAP 0
 int MAP_STATE;
 
 extern db_handle *open_dbs;
@@ -178,11 +176,13 @@ off64_t mount_volume(char *volume_name, int64_t start, int64_t unused_size)
 		if(MAP_STATE == 0)
 		{
 		// mmap the device
+			log_info("Using MMap");
 			addr_space = mmap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
 		}
 		else
 		{
-			addr_space = umap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
+			log_info("Using UMap");
+			addr_space = umap(NULL, device_size, PROT_READ, MAP_SHARED, FD, start);
 		}
 		if (addr_space == MAP_FAILED) {
 			log_fatal("MMAP for device %s reason follows", volume_name);
