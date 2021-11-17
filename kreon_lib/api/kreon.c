@@ -20,7 +20,6 @@
 
 klc_handle klc_open(klc_db_options *options)
 {
-	MAP_STATE = MAP_UMAP;
 	switch (options->create_flag) {
 	case KLC_CREATE_DB:
 		return (klc_handle)db_open(options->volume_name, options->volume_start, options->volume_size,
