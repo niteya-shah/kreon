@@ -84,7 +84,7 @@ unsigned long long find_prefix_miss;
 unsigned long long scan_prefix_hit;
 unsigned long long scan_prefix_miss;
 
-int MAP_STATE;
+int MAP_STATE = MAP_MMAP;
 
 extern db_handle *open_dbs;
 pthread_mutex_t VOLUME_LOCK = PTHREAD_MUTEX_INITIALIZER;
@@ -1380,13 +1380,17 @@ void allocator_init(volume_descriptor *volume_desc)
 			  volume_desc->volume_id);
 		exit(EXIT_FAILURE);
 	}
-	char *addr_space, fd;
-	fd = open(volume_desc->volume_name, O_RDWR | O_DIRECT | O_SYNC);
 
-	log_info("Using UMap");
-	addr_space = umap(NULL, volume_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if(MAP_STATE == MAP_UMAP)
+	{
+		char *addr_space, fd;
+		fd = open(volume_desc->volume_name, O_RDWR | O_DIRECT | O_SYNC);
+		log_info("Using UMap");
+		addr_space = umap(NULL, volume_size, PROT_READ, MAP_PRIVATE, fd, 0);
 
-	MAPPED = (uint64_t)addr_space;
+		MAPPED = (uint64_t)addr_space;
+	}
+
 	return;
 }
 

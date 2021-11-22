@@ -27,6 +27,7 @@
 #endif
 
 #include "db_factory.h"
+#include "../../kreon_lib/allocator/allocator.h"
 
 using namespace std;
 
@@ -148,6 +149,7 @@ uint64_t DelegateRunClient(ycsbc::YCSBDB *db, ycsbc::CoreWorkload *wl, int id, u
 
 void execute_load(utils::Properties &props, ycsbc::YCSBDB *db)
 {
+	MAP_STATE = MAP_MMAP;
 	ycsbc::CoreWorkload wl;
 	wl.Init(props);
 
@@ -201,6 +203,7 @@ void execute_load(utils::Properties &props, ycsbc::YCSBDB *db)
 
 void execute_run(utils::Properties &props, ycsbc::YCSBDB *db)
 {
+	MAP_STATE = MAP_UMAP;
 	ycsbc::CoreWorkload wl;
 	wl.Init(props);
 	const int num_threads = stoi(props.GetProperty("threadcount", "1"));
@@ -269,12 +272,6 @@ int main(const int argc, const char *argv[])
 	std::string line;
 	ycsbc::YCSBDB *db;
 	while (std::getline(infile, line)) {
-		gettimeofday(&start, NULL);
-		db = ycsbc::DBFactory::CreateDB(db_num, props);
-		gettimeofday(&end, NULL);
-		printf("Opening DB takes %ld usec\n",
-		       ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
-
 		if (line[0] == '#') // comments in execution plan
 			continue;
 
@@ -295,11 +292,6 @@ int main(const int argc, const char *argv[])
 		getcwd(path, 256);
 		std::cout << "workload_file_path = " << path << '/' << c << std::endl;
 		read_workload_file(c.c_str(), props);
-		gettimeofday(&start, NULL);
-		db->Init();
-		gettimeofday(&end, NULL);
-		printf("Init DB takes %ld usec\n",
-		       ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
 		std::string tmp = create_directory + space + results_directory + slash + a;
 		system(tmp.c_str());
 		std::string outfilename = results_directory + slash + a + slash + outf;
@@ -308,10 +300,43 @@ int main(const int argc, const char *argv[])
 			std::cerr << "ERROR: Failed to open output file " << outfilename << std::endl;
 			exit(-1);
 		}
+
+
 		if (b == "load")
+		{
+			gettimeofday(&start, NULL);
+			db = ycsbc::DBFactory::CreateDB(db_num, props);
+			gettimeofday(&end, NULL);
+
+			gettimeofday(&start, NULL);
+			db->Init();
+			gettimeofday(&end, NULL);
+			printf("Init DB takes %ld usec\n",
+				((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+
+			printf("Opening DB takes %ld usec\n",
+				((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+
 			execute_load(props, db);
+		}
 		else if (b == "run")
+		{
+			MAP_STATE = MAP_UMAP;
+			gettimeofday(&start, NULL);
+			db = ycsbc::DBFactory::CreateDB(db_num, props);
+			gettimeofday(&end, NULL);
+
+			gettimeofday(&start, NULL);
+			db->Init();
+			gettimeofday(&end, NULL);
+			printf("Init DB takes %ld usec\n",
+				((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+
+			printf("Opening DB takes %ld usec\n",
+				((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+
 			execute_run(props, db);
+		}
 		else
 			assert(0);
 
