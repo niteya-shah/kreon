@@ -318,6 +318,15 @@ int main(const int argc, const char *argv[])
 				((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
 
 			execute_load(props, db);
+
+			if(MAP_STATE == MAP_UMAP)
+			{
+				char *addr_space;
+				log_info("Using UMap");
+				addr_space = umap(NULL, volume_size, PROT_READ, MAP_PRIVATE, FD, 0);
+
+				MAPPED = (uint64_t)addr_space;
+			}
 		}
 		else if (b == "run")
 		{

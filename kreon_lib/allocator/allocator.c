@@ -175,6 +175,7 @@ off64_t mount_volume(char *volume_name, int64_t start, int64_t unused_size)
 		log_info("Creating virtual address space offset %lld size %ld\n", (long long)start, device_size);
 
 		log_info("Using MMap");
+		log_info("device Size is %i", (int)device_size);
 		addr_space = mmap(NULL, device_size, PROT_READ | PROT_WRITE, MAP_SHARED, FD, start);
 
 		if (addr_space == MAP_FAILED) {
@@ -1379,16 +1380,6 @@ void allocator_init(volume_descriptor *volume_desc)
 			  "mkfs command and retry",
 			  volume_desc->volume_id);
 		exit(EXIT_FAILURE);
-	}
-
-	if(MAP_STATE == MAP_UMAP)
-	{
-		char *addr_space, fd;
-		fd = open(volume_desc->volume_name, O_RDWR | O_DIRECT | O_SYNC);
-		log_info("Using UMap");
-		addr_space = umap(NULL, volume_size, PROT_READ, MAP_PRIVATE, fd, 0);
-
-		MAPPED = (uint64_t)addr_space;
 	}
 
 	return;
